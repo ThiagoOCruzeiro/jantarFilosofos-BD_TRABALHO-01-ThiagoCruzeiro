@@ -1,0 +1,51 @@
+CREATE DATABASE loja_cerrado;
+USE loja_cerrado;
+
+CREATE TABLE CLIENTE (
+    cid INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    cidade VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE PRODUTO (
+    rid INT PRIMARY KEY,
+    descricao VARCHAR(100) NOT NULL,
+    categoria VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE SKU (
+    sku_id INT PRIMARY KEY AUTO_INCREMENT,
+    rid INT NOT NULL,
+    codigo_sku VARCHAR(30) UNIQUE NOT NULL,
+    variacao VARCHAR(100) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (rid) REFERENCES PRODUTO(rid)
+);
+
+CREATE TABLE ESTOQUE (
+    sku_id INT PRIMARY KEY,
+    saldo INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (sku_id) REFERENCES SKU(sku_id),
+    CHECK (saldo >= 0)
+);
+
+CREATE TABLE PEDIDO (
+    pid INT PRIMARY KEY AUTO_INCREMENT,
+    cid INT NOT NULL,
+    status ENUM(
+        'PENDENTE',
+        'CONCLUIDO',
+        'CANCELADO'
+    ) DEFAULT 'PENDENTE',
+    FOREIGN KEY (cid) REFERENCES CLIENTE(cid)
+);
+
+CREATE TABLE ITEM (
+    pid INT NOT NULL,
+    sku_id INT NOT NULL,
+    qtd INT NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (pid, sku_id),
+    FOREIGN KEY (pid) REFERENCES PEDIDO(pid),
+    FOREIGN KEY (sku_id) REFERENCES SKU(sku_id)
+);
